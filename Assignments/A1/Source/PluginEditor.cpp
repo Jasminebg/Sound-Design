@@ -30,7 +30,7 @@ A1StarterAudioProcessorEditor::A1StarterAudioProcessorEditor (A1StarterAudioProc
     arpSlider.addListener (this);
 
 
-    octaveSlider.setSliderStyle(juce::Slider::LinearBar);
+    octaveSlider.setSliderStyle(juce::Slider::LinearBarVertical);
     octaveSlider.setRange(1, 10, 1);
     octaveSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     octaveSlider.setPopupDisplayEnabled(true, false, this);
@@ -45,10 +45,11 @@ A1StarterAudioProcessorEditor::A1StarterAudioProcessorEditor (A1StarterAudioProc
          arpButtons = 1001,
         customButtons = 1002
      };
-         getLookAndFeel().setColour(juce::TextButton::buttonColourId, juce::Colours::pink);
          ascButton.onClick = [this] { arpeggiationStyle (&ascButton,   "Ascending");   };
+         getLookAndFeel().setColour(juce::TextButton::buttonColourId, juce::Colours::pink);
          descButton.onClick = [this] { arpeggiationStyle (&descButton, "Descending"); };
          customButton.onClick = [this] { arpeggiationStyle(&customButton, "Custom"); };
+         ascButton.setColour(juce::TextButton::buttonColourId, juce::Colours::black);
 
          ascButton.setRadioGroupId (customButtons);
          descButton.setRadioGroupId (arpButtons);
@@ -62,20 +63,7 @@ A1StarterAudioProcessorEditor::A1StarterAudioProcessorEditor (A1StarterAudioProc
          noteOrder.onTextChange = [this] {arpeggiationOrder(&noteOrder); };
          addAndMakeVisible(noteOrder);
 
-
-         /*noteDurationIns.add(noteDurationA, noteDurationB, noteDurationC, noteDurationD,
-                        noteDurationE, noteDurationF, noteDurationG,
-                        noteDurationAb, noteDurationBb, noteDurationDb,
-                        noteDurationEb, noteDurationGb);*/
-         
-        //for(int i = 0; i < 12; i ++){
-        //    noteDurationIns[i].setText("1");
-        //    addAndMakeVisible(noteDurationIns[i]);
-        //    
-        //    //noteDurationIns[i].onTextChange = [this] { noteDurations(&noteDurationIns[i], i); };
-
-        //}
-
+        //could not get array of TextEditors working
 
         noteDurationC.setText("1");
         noteDurationDb.setText("1");
@@ -138,20 +126,19 @@ void A1StarterAudioProcessorEditor::paint (juce::Graphics& g)
  
     g.drawFittedText ("Arpeggiator", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
 
-    g.drawFittedText("Octaves", octaveSlider.getX(), octaveSlider.getY() - 25, getWidth(), 30, juce::Justification::centred, 1);
+    g.drawFittedText("Octaves: ", octaveSlider.getX() - 70, octaveSlider.getY() + octaveSlider.getHeight()/3, getWidth(), 30, juce::Justification::centredLeft, 1);
 
-    g.drawFittedText("Arpeggiator Direction",ascButton.getX(), ascButton.getY() - 30, getWidth(), 30, juce::Justification::centredLeft, 1);
+    g.drawFittedText("Arpeggiator Direction: ",ascButton.getX(), ascButton.getY() - 30, getWidth(), 30, juce::Justification::centredLeft, 1);
 
-    g.drawFittedText ("Arpeggiation Note Order \n (Include spaces between notes,i.e.\"Db A Gb C \"): ", 
-                        noteOrder.getX() - 60, noteOrder.getY()-30, getWidth(), 30, juce::Justification::centredLeft, 1);
+    g.drawFittedText ("Custom Note Order \n (Include spaces between notes,i.e.\"Db A Gb C \"): ", 
+                        noteOrder.getX() - 75, noteOrder.getY()-30, getWidth(), 30, juce::Justification::centredLeft, 1);
 
-   // g.drawFittedText("Arpeggiator Direction", 0, ascButton.getY() - 20, getWidth(), 30, juce::Justification::centredLeft, 1);
 
-    g.drawFittedText("Custom note order \n(Toggle on/off): ", customButton.getX(), customButton.getY() - 40, getWidth(), 30, 
+    g.drawFittedText("Custom note order toggle: ", customButton.getX(), customButton.getY() - 30, getWidth(), 30, 
                             juce::Justification::centredLeft, 1);
 
     g.drawFittedText ("Note Durations ( 0 < duration <= 2 ): ", 
-                        noteDurationF.getX()-30, noteDurationF.getY()-40, getWidth(), 30, juce::Justification::centredLeft, 1);
+                        noteDurationF.getX()-50, noteDurationF.getY()-40, getWidth(), 30, juce::Justification::centredLeft, 1);
     for(int i = 0; i < 12; i ++){
         g.drawFittedText (audioProcessor.musicnotes[i], 
                         noteDurationC.getX()+ 10 +((i)*30), noteDurationC.getY() - 20, getWidth(),
@@ -173,10 +160,10 @@ void A1StarterAudioProcessorEditor::resized()
    // descButton.changeWidthToFitText();
     customButton.setBounds(ascButton.getX(), descButton.getY()+100, 100, 40);
     // customButton.changeWidthToFitText();
-    noteOrder.setBounds(getWidth() / 2, getHeight() / 2, 100, 20);
-    octaveSlider.setBounds(65 , arpSlider.getHeight()-20 , getWidth() - 80, 20);
+    noteOrder.setBounds(getWidth() / 2 - 50, getHeight() / 2 + 40, 100, 20);
+    octaveSlider.setBounds(getWidth()-65 , 30 , 20, getHeight() - 60);
 
-    noteDurationC.setBounds(getWidth()/4, getHeight()/2+60, 30, 20);
+    noteDurationC.setBounds(getWidth()/4 - 25, getHeight()/2+100, 30, 20);
     noteDurationDb.setBounds(noteDurationC.getX()+30, noteDurationC.getY(), 30, 20);
     noteDurationD.setBounds(noteDurationDb.getX() + 30, noteDurationC.getY(), 30, 20);
     noteDurationEb.setBounds(noteDurationD.getX() + 30, noteDurationC.getY(), 30, 20);
@@ -188,10 +175,6 @@ void A1StarterAudioProcessorEditor::resized()
     noteDurationA.setBounds(noteDurationAb.getX() + 30, noteDurationC.getY(), 30, 20);
     noteDurationBb.setBounds(noteDurationA.getX() + 30, noteDurationC.getY(), 30, 20);
     noteDurationB.setBounds(noteDurationBb.getX() + 30, noteDurationC.getY(), 30, 20);
-    /*noteDurationA.setBounds(noteOrder.getX()-20, noteOrder.getY()+20, 20, 20);
-    for(int i = 1; i < 12; i ++){
-        noteDurationIns[i].setBounds(noteDurationIns[i].getX()+20, noteDurationIns[i].getY(), 40, 20);
-        }*/
 }
 
 void A1StarterAudioProcessorEditor::sliderValueChanged (juce::Slider* slider)
@@ -226,17 +209,12 @@ void A1StarterAudioProcessorEditor::arpeggiationStyle(juce::TextButton* toggles,
 
 void A1StarterAudioProcessorEditor::arpeggiationOrder(juce::TextEditor* input) {
     
-        //audioProcessor.arpOrder = input->getText();
-        //juce::String notesupper = "ABCDEFG";
-        //juce::String accidentals = "BB DB EB GB AB";
-    // juce::String noteslower = "abcdefg";
         juce::String playingorder = "";
 
         juce::StringArray tokens;
         tokens.addTokens(input->getText(), " ");
         for (int i = 0; i < tokens.size() - 1; i++) {
             if(!audioProcessor.musicnotes.contains(tokens[i].toUpperCase())){
-            //if (!notesupper.contains(tokens[i].toUpperCase()) &&  !accidentals.contains(tokens[i].toUpperCase())){
 
 
             }
@@ -252,15 +230,9 @@ void A1StarterAudioProcessorEditor::arpeggiationOrder(juce::TextEditor* input) {
 
 }
 void A1StarterAudioProcessorEditor::noteDurations(juce::TextEditor* text, int pos) {
-    //audioProcessor.noteDurations[pos] = text->getText().getFloatValue();
+
     if (text->getText().getDoubleValue() > 0 && text->getText().getDoubleValue()<= 2) {
         audioProcessor.noteDurations.insert(pos, text->getText().getDoubleValue());
     }
 
-    //if box1(C), noteDurations[0] and so on
-   /* for(int i = 0; i < 12; i++){
-        if ((noteDurationIns[i].getText().getFloatValue()) > 0 && (noteDurationIns[i].getText().getFloatValue()) <= 1) {
-            audioProcessor.noteDurations.insert(i, noteDurationIns[i].getText().getFloatValue());
-            }
-        }*/
     }

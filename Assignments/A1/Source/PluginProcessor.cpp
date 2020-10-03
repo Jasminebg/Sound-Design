@@ -229,7 +229,7 @@ void A1StarterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
                 }
                 else lastNoteValue = (alterednotes[currentNote] + currentOctave * 12 );
 
-                DBG("midi value " << lastNoteValue);
+               // DBG("midi value " << lastNoteValue);
                  
                 midi.addEvent(juce::MidiMessage::noteOn(1, lastNoteValue, (juce::uint8) 127), offset);
 

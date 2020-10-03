@@ -52,7 +52,6 @@ private:
                         noteDurationE, noteDurationF, noteDurationG,
                         noteDurationAb, noteDurationBb, noteDurationDb,
                         noteDurationEb, noteDurationGb;
-        juce::Array<juce::TextEditor> noteDurationIns ;
 
 
 };
