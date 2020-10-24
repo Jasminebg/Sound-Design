@@ -62,7 +62,7 @@ public:
         const float* bufferData, const float* delayBufferData, const double gainstart, const double gainend);
     void getDelayBuff(juce::AudioBuffer<float>& buffer, int channel, const int numSamples,
         const int delayBufferLen, const float* bufferData, const float* delayBufferData);
-    void FeedbackDelay( int channel, const int numSamples, const int delayNumSamples, const float* bufferData, float* data,
+    void FeedbackDelay( int channel, const int numSamples, const int delayNumSamples,  float* data,
                         const double gainstart, const double gainend);
 private:
 

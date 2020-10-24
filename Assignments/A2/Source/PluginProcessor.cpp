@@ -101,7 +101,8 @@ void A2StarterAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlo
     //volumeBoost = 1.0;
     dry = 100;
     lastFeed = 1;
-    wet, feedback, lastping, time = 0;
+    lastping = 1;
+    wet, feedback,  time = 0;
     pingpong = false;
 
     // Need to change this value to a number that corresponds to 3 seconds
@@ -159,61 +160,38 @@ void A2StarterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
         buffer.clear(i, 0, numSamples);
         delayBuffer.clear(i, 0, delayNumSamples);
+        
     }
 
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-     //   if (pingpong && lastping == channel) {}
-      //  else {
-
             double channelfeedback = feedback / 100;
-
-
-
             float* data = buffer.getWritePointer(channel);
-
 
             const float* bufferData = buffer.getReadPointer(channel);
             const float* delayBufferData = delayBuffer.getReadPointer(channel);
 
-
             for (int i = 0; i < numSamples; ++i) {
                 data[i] = data[i] * dry / 100;
-
             }
-
             //Wet delay, only called if wet > 0 to not make a greater load
             if (wet > 0) {
                  //currently has an issue where if you increase the time interval fast enough 
                  //right after the wet sound, it will play again at that new interval
-
                 fillDelayBuff(channel, numSamples, delayNumSamples, bufferData, delayBufferData, wet/100, wet / 100);
                 getDelayBuff(buffer, channel, numSamples, delayNumSamples, bufferData, delayBufferData);
-                /*for (int i = 0; i < numSamples; ++i) {
-                    DBG("data" << data[i]);
-
-                }*/
+                
             }
             if (channelfeedback > 0) {
-                //DBG("feedback" << feedback);
-                FeedbackDelay(channel, numSamples, delayNumSamples, bufferData, data, channelfeedback, channelfeedback);
+                
+                FeedbackDelay(channel, numSamples, delayNumSamples, data, channelfeedback, channelfeedback);
                 getDelayBuff(buffer, channel, numSamples, delayNumSamples, bufferData, delayBufferData);
-
-              /*  for (int i = 0; i < numSamples; ++i) {
-                    DBG("data2" << data[i]);
-
-                }*/
+              
             }
-         //   lastping = channel;
-      //  }
-          //DBG("feedback" << feedback);
-
     }
     WritePosition += numSamples;
     WritePosition %= delayNumSamples;
-
-
 }
 
 void A2StarterAudioProcessor::fillDelayBuff(int channel, const int numSamples, const int delayNumSamples,
@@ -234,6 +212,9 @@ void A2StarterAudioProcessor::fillDelayBuff(int channel, const int numSamples, c
 void A2StarterAudioProcessor::getDelayBuff(juce::AudioBuffer<float>& buffer, int channel, const int numSamples,
     const int delayNumSamples, const float* bufferData, const float* delayBufferData) {
     int readPosition = (int)(delayNumSamples + WritePosition - (rate * time)) % delayNumSamples;
+    //if (feedback > 0 && pingpong) {
+    //    channel = lastping;
+    //}
 
     if (delayNumSamples > numSamples + readPosition) {
         buffer.addFrom(channel, 0, delayBufferData + readPosition, numSamples);
@@ -248,22 +229,26 @@ void A2StarterAudioProcessor::getDelayBuff(juce::AudioBuffer<float>& buffer, int
 
 
 void A2StarterAudioProcessor::FeedbackDelay(int channel, const int numSamples,
-    const int delayNumSamples, const float* bufferData, float* data, const double gainstart, const double gainend) {
+    const int delayNumSamples, float* data, const double gainstart, const double gainend) {
 
-
-
+    //DBG("lastping" << lastping);
+    //DBG("channel" << channel);
+    if (feedback > 0 && pingpong && lastping == channel) {
+        channel += 1;
+        channel %= 2;
+        lastping = channel;
+    }
     if (delayNumSamples > numSamples + WritePosition) {
         delayBuffer.copyFromWithRamp(channel, WritePosition, data, numSamples, gainstart, gainend);
 
     }
     else {
         const int remainder = delayNumSamples - WritePosition;
+
         delayBuffer.copyFromWithRamp(channel, remainder, data, remainder, gainstart, gainend);
         delayBuffer.copyFromWithRamp(channel, 0, data, delayNumSamples - remainder, gainstart, gainend);
     }
-   /* DBG("lastgain" << lastGain);
-    DBG("gain" << gainstart);
-    DBG("gain" << gainend);*/
+
 }
 
 //==============================================================================

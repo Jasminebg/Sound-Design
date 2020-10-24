@@ -15,14 +15,14 @@ A2StarterAudioProcessorEditor::A2StarterAudioProcessorEditor(A2StarterAudioProce
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize(500, 500);
+    setSize(500, 250);
 
     // these define the parameters of our slider object
-    timeSlider.setSliderStyle(juce::Slider::LinearBarVertical);
+    //timeSlider.setSliderStyle(juce::Slider::LinearBarVertical);
     timeSlider.setRange(0.0, 3.0, 0.05);
     timeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     timeSlider.setPopupDisplayEnabled(true, false, this);
-    timeSlider.setTextValueSuffix(" Time (seconds)");
+    timeSlider.setTextValueSuffix(" Seconds");
     timeSlider.setValue(0);
 
     //// this function adds the slider to the editor
@@ -30,7 +30,7 @@ A2StarterAudioProcessorEditor::A2StarterAudioProcessorEditor(A2StarterAudioProce
     timeSlider.addListener(this);
 
     // these define the parameters of our slider object
-    drySlider.setSliderStyle(juce::Slider::LinearBarVertical);
+    //drySlider.setSliderStyle(juce::Slider::LinearBarVertical);
     drySlider.setRange(0.0, 100.0, 1.0);
     drySlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     drySlider.setPopupDisplayEnabled(true, false, this);
@@ -42,7 +42,7 @@ A2StarterAudioProcessorEditor::A2StarterAudioProcessorEditor(A2StarterAudioProce
     drySlider.addListener(this);
 
     // these define the parameters of our slider object
-    wetSlider.setSliderStyle(juce::Slider::LinearBarVertical);
+    //wetSlider.setSliderStyle(juce::Slider::LinearBarVertical);
     wetSlider.setRange(0.0, 100.0, 1.0);
     wetSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     wetSlider.setPopupDisplayEnabled(true, false, this);
@@ -55,7 +55,7 @@ A2StarterAudioProcessorEditor::A2StarterAudioProcessorEditor(A2StarterAudioProce
 
 
     // these define the parameters of our slider object
-    feedbackSlider.setSliderStyle(juce::Slider::LinearBarVertical);
+    //feedbackSlider.setSliderStyle(juce::Slider::LinearBarVertical);
     feedbackSlider.setRange(0.0, 100.0, 1.0);
     feedbackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     feedbackSlider.setPopupDisplayEnabled(true, false, this);
@@ -97,11 +97,13 @@ void A2StarterAudioProcessorEditor::paint(juce::Graphics& g)
     g.setFont(15.0f);
 
     g.drawFittedText("A2 Delay", 0, 0, getWidth(), 30, juce::Justification::centred, 1);
-    g.drawFittedText("Time interval", timeSlider.getX()-20, timeSlider.getY() - 30, 80, 30, juce::Justification::centredLeft, 1);
-    g.drawFittedText("Dry", drySlider.getX(), drySlider.getY()-30, 80, 30, juce::Justification::centredLeft, 1);
-    g.drawFittedText("Wet", wetSlider.getX(), wetSlider.getY()-30, 80, 30, juce::Justification::centredLeft, 1);
-    g.drawFittedText("Feedback", feedbackSlider.getX()-20, feedbackSlider.getY() - 30, 80, 30, juce::Justification::centredLeft, 1);
-    g.drawFittedText("PingPong", pingpongButton.getX()-20, pingpongButton.getY() - 30, 80, 30, juce::Justification::centredLeft, 1);
+    g.drawFittedText("Time interval", timeSlider.getX(), timeSlider.getY() - 30, 80, 30, juce::Justification::centred, 1);
+    g.drawFittedText("Dry", drySlider.getX()-25, drySlider.getY()-30, 80, 30, juce::Justification::centred, 1);
+    g.drawFittedText("Wet", wetSlider.getX()-25, wetSlider.getY()-30, 80, 30, juce::Justification::centred, 1);
+    g.drawFittedText("Feedback", feedbackSlider.getX()-5, feedbackSlider.getY() - 30, 80, 30, juce::Justification::centred, 1);
+    g.drawFittedText("PingPong", pingpongButton.getX()-15, pingpongButton.getY() - 30, 80, 30, juce::Justification::centred, 1);
+    g.drawFittedText("*Feedback is buggy, reset to 0 if audio gets messy", feedbackSlider.getX() ,
+                        feedbackSlider.getY() + 10 , feedbackSlider.getWidth(), 30, juce::Justification::centred, 1);
 }
 
 void A2StarterAudioProcessorEditor::resized()
@@ -109,11 +111,11 @@ void A2StarterAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     // sets the position and size of the slider with arguments (x, y, width, height)
-    timeSlider.setBounds(40, 50, 20, getHeight() - 60);
-    drySlider.setBounds(timeSlider.getX() + 80, 50, 20, getHeight() - 60);
-    wetSlider.setBounds(drySlider.getX() + 80, 50, 20, getHeight() - 60);
-    feedbackSlider.setBounds(wetSlider.getX() + 80, 50, 20, getHeight() - 60);
-    pingpongButton.setBounds(feedbackSlider.getX() + 80, drySlider.getHeight() / 2 + 30, 40, 40);
+    timeSlider.setBounds(20, 50, getWidth() - 80, 20);
+    drySlider.setBounds(20 , 100, getWidth() - 80, 20);
+    wetSlider.setBounds(20, 150, getWidth() - 80, 20);
+    feedbackSlider.setBounds(20, 200, getWidth() - 80, 20);
+    pingpongButton.setBounds(getWidth()- 60, drySlider.getY() + 15, 40, 40);
 }
 
 void A2StarterAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
