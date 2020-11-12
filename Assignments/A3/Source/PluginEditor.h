@@ -45,7 +45,7 @@ private:
     juce::Slider wetSlider;
     juce::Slider widthSlider;
      
-    //juce::TextButton openButton{"Open file.."};
+    juce::TextButton openButton{"Open file.."};
 
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> cutOffValue;
@@ -63,7 +63,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> wetValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> widthValue;
-    //std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> buttonValue;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> buttonValue;
 
 
     void buttonClicked();

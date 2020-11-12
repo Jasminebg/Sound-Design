@@ -14,7 +14,7 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     setSize (800, 400); 
-    //addAndMakeVisible(&openButton);
+    addAndMakeVisible(&openButton);
     //openButton.onClick = [this] { buttonClicked(); };
     
     filterMenu.setJustificationType(juce::Justification::centred);
@@ -107,7 +107,7 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     roomValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "ROOMSIZE", roomSlider);
     wetValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WET", wetSlider);
     widthValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WIDTH", widthSlider);
-    //buttonValue = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "BUTTON", openButton);
+    buttonValue = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "BUTTON", openButton);
 
     filterMenuValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "FILTERMENU", filterMenu);
     phaserMenuValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "PHASERMENU", phaserMenu);
@@ -159,7 +159,7 @@ void A3AudioProcessorEditor::resized()
     phaserMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
     reverbType.setBounds(menus.removeFromLeft(width / 4 - 5));
     impulseMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
-    //openButton.setBounds(impulseMenu.getX(), impulseMenu.getY() + 40, impulseMenu.getWidth() , 50);
+    openButton.setBounds(impulseMenu.getX(), impulseMenu.getY() + 40, impulseMenu.getWidth() , 50);
     cutOffSlider.setBounds (35 , 90, width / 6 - 10, 100);
     rateSlider.setBounds (125, 90, width / 6 - 10, 100);
     depthSlider.setBounds (205, 90, width / 6 - 10, 100);

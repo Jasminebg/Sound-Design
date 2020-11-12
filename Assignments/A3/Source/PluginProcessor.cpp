@@ -164,7 +164,12 @@ void A3AudioProcessor::updateFX()
     
     
     //if (reverbChoice == 2) {
+   /*     if (openfile) {
+            buttonClicked();
+            apvts.getParameter("Button")->setValue(false);
+            openfile = false;
 
+        }*/
         juce::File desktop;
         juce::File irfile;
 
@@ -191,17 +196,18 @@ void A3AudioProcessor::updateFX()
 }
 
 
-//juce::File A3AudioProcessor::buttonClicked()
-//{
-//   juce::FileChooser chooser("Select a Wave file to play...", {}, "*.wav");                                        
-//
-//   if (chooser.browseForFileToOpen())
-//   {
-//       auto file = chooser.getResult();
-//       return file;
-//   }
-//
-//}
+juce::File A3AudioProcessor::buttonClicked()
+{
+   juce::FileChooser chooser("Select a Wave file to play...", {}, "*.wav");                                        
+
+   if (chooser.browseForFileToOpen())
+   {
+       auto file = chooser.getResult();
+       return file;
+
+   }
+
+}
 
 void A3AudioProcessor::updateParameters()
 {
@@ -305,7 +311,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout A3AudioProcessor::createPara
     layout.add(std::make_unique<juce::AudioParameterFloat>("ROOMSIZE", "Room size", 0.0f, 1.0f, 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("WET", "Wet", 0.0f, 1.0f, 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("WIDTH", "Width", 0.0f, 1.0f, 0.0f));
-    //layout.add(std::make_unique<juce::AudioParameterFloat>("BUTTON", "Button", 0.0f, 1.0f, 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterBool>("BUTTON", "Button", false));
+    //layout.add(std::make_unique<juce::ButtonParameterAttachment>(juce::RangedAudioParameter::, "Button"));
     
 
     return layout;

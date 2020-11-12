@@ -56,7 +56,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //juce::TextButton openButton{ "Open file.." };
-    //juce::File buttonClicked();
+    juce::File buttonClicked();
 
     void updateFX();
     void updateParameters ();
