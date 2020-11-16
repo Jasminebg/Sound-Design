@@ -17,11 +17,15 @@ class A3AudioProcessor  : public juce::AudioProcessor
 {
 public:
     juce::File userfile;
+    juce::File desktop;
+    juce::File irfile, lastir;
+    int reverbType;
+    juce::AudioBuffer<float> outbuffer;
+    juce::AudioBuffer<float> irBuffer;
     //juce::Array<juce::File> impulses;
     //==============================================================================
     A3AudioProcessor();
     ~A3AudioProcessor() override;
-
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -55,21 +59,28 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    //juce::TextButton openButton{ "Open file.." };
-    juce::File buttonClicked();
-
+    void decreasing(juce::AudioBuffer<float>& buffer );
     void updateFX();
     void updateParameters ();
     juce::AudioProcessorValueTreeState apvts;
+
+    void fillreverb(int channel, const int numSamples, const int delayBufferLen, const float* bufferData, const float* delayBufferData);
+    void fillbuffer(juce::AudioBuffer<float>& buffer, int channel, const int numSamples,
+        const int delayBufferLen,  const float* delayBufferData);
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     
     juce::dsp::StateVariableTPTFilter<float> stateVariableFilter;
+    juce::dsp::AudioBlock<float> tmpblock;
     bool bypassFilter = false;
-    
+    int sRate, sBlock;
+
+    int WritePosition{ 0 };
     enum { phaserIndex, gainIndex, reverbIndex, convoIndex};
     juce::dsp::ProcessorChain<juce::dsp::Phaser<float>,juce::dsp::Gain<float>, juce::dsp::Reverb, juce::dsp::Convolution> fxChain;
+    enum { ccIndex };
+    juce::dsp::ProcessorChain<juce::dsp::Convolution> constructedIR;
     bool bypassPhaser = false;
     
     //==============================================================================

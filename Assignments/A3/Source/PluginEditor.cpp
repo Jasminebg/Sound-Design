@@ -15,60 +15,73 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
 {
     setSize (800, 400); 
     addAndMakeVisible(&openButton);
-    //openButton.onClick = [this] { buttonClicked(); };
+    openButton.onClick = [this] { buttonClicked(); };
     
-    filterMenu.setJustificationType(juce::Justification::centred);
-    filterMenu.addItem("Filter: Low Pass", 1);
-    filterMenu.addItem("Filter: Band Pass", 2);
-    filterMenu.addItem("Filter: High Pass", 3);
-    filterMenu.addItem("Filter: Off", 4);
-    addAndMakeVisible(&filterMenu);
+    //filterMenu.setJustificationType(juce::Justification::centred);
+    //filterMenu.addItem("Filter: Low Pass", 1);
+    //filterMenu.addItem("Filter: Band Pass", 2);
+    //filterMenu.addItem("Filter: High Pass", 3);
+    //filterMenu.addItem("Filter: Off", 4);
+    //addAndMakeVisible(&filterMenu);
 
-    phaserMenu.setJustificationType(juce::Justification::centred);
-    phaserMenu.addItem("Phaser: On", 1);
-    phaserMenu.addItem("Phaser: Off", 2);
-    addAndMakeVisible(&phaserMenu);
+    //phaserMenu.setJustificationType(juce::Justification::centred);
+    //phaserMenu.addItem("Phaser: On", 1);
+    //phaserMenu.addItem("Phaser: Off", 2);
+    //addAndMakeVisible(&phaserMenu);
+
+    emulatedImpulseMenu.setJustificationType(juce::Justification::centred);
+    emulatedImpulseMenu.addItem("No Emulated IR", 1);
+    emulatedImpulseMenu.addItem("Fast Decay IR", 2);
+    emulatedImpulseMenu.addItem("Slow Decay IR", 3);
+    addAndMakeVisible(&emulatedImpulseMenu);
 
     reverbType.setJustificationType(juce::Justification::centred);
-    reverbType.addItem("Reverb 1", 1);
-    reverbType.addItem("Reverb 2", 2);
-    reverbType.addItem("Reverb 3", 3);
-    reverbType.addItem("Reverb 4", 4);
+    reverbType.addItem("No Reverb", 1);
+    reverbType.addItem("Reverb 1", 2);
+    reverbType.addItem("Recorded Impulse Response", 3);
+    reverbType.addItem("Constructed Impulse Response", 4);
+    reverbType.addItem("Simluation Reverb", 5);
     addAndMakeVisible(&reverbType);
 
 
     impulseMenu.setJustificationType(juce::Justification::centred);
+    //auto files = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("Resources").findChildFiles(3, true, "*.wav");
     impulseMenu.addItem("Impulse: Off", 1);
-    impulseMenu.addItem("Conic Long Echo Hall", 2);
-    impulseMenu.addItem("Highly Damped Large Room", 3);
-    impulseMenu.addItem("In a Silo", 4);
-    impulseMenu.addItem("Large Wide Echo Hall", 5);
-    impulseMenu.addItem("On a Star", 6);
-    impulseMenu.addItem("User Impulse Response", 7);
+ /*   for (int i = 0; i < files.size(); i++) {
+        impulseMenu.addItem(files[i].getFileNameWithoutExtension(), i + 1);
+    }*/
+    impulseMenu.addItem("Direct Cabinet N1", 2);
+    impulseMenu.addItem("Deep Space", 3);
+    impulseMenu.addItem("Chateau de Logne, Outside", 4);
+    impulseMenu.addItem("Small Drum Room", 5);
+    impulseMenu.addItem("Bottle Hall", 6);
+    impulseMenu.addItem("cassette recorder", 7);
+    impulseMenu.addItem("guitar amp", 8);
+    impulseMenu.addItem("{ Uploaded Impulse Response }", 9);
     //int numimp = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getNumberOfChildFiles(3, "*.wav");
     //audioProcessor.desktop.getFileNameWithoutExtension
     addAndMakeVisible(&impulseMenu);
 
     
-    cutOffSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    cutOffSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    cutOffSlider.setPopupDisplayEnabled(true, true, this);
-    addAndMakeVisible(&cutOffSlider);
-    
-    rateSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    rateSlider.setPopupDisplayEnabled(true, true, this);
-    addAndMakeVisible(&rateSlider);
-    
-    depthSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    depthSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    depthSlider.setPopupDisplayEnabled(true, true, this);
-    addAndMakeVisible(&depthSlider);
-    
-    gainSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    gainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    gainSlider.setPopupDisplayEnabled(true, true, this);
-    addAndMakeVisible(&gainSlider);
+    //cutOffSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    //cutOffSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    //cutOffSlider.setPopupDisplayEnabled(true, true, this);
+    //addAndMakeVisible(&cutOffSlider);
+    //
+    //rateSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    //rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    //rateSlider.setPopupDisplayEnabled(true, true, this);
+    //addAndMakeVisible(&rateSlider);
+    //
+    //depthSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    //depthSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    //depthSlider.setPopupDisplayEnabled(true, true, this);
+    //addAndMakeVisible(&depthSlider);
+    //
+    //gainSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    //gainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    //gainSlider.setPopupDisplayEnabled(true, true, this);
+    //addAndMakeVisible(&gainSlider);
 
     //reverb
   /*  dampSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
@@ -95,7 +108,13 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     widthSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     widthSlider.setPopupDisplayEnabled(true, true, this);
     addAndMakeVisible(&widthSlider);
-    
+
+    IRLengthSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    IRLengthSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    IRLengthSlider.setPopupDisplayEnabled(true, true, this);
+    addAndMakeVisible(&IRLengthSlider);
+
+
     cutOffValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "CUTOFF", cutOffSlider);
     rateValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "PHASERRATE", rateSlider);
     depthValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "PHASERDEPTH", depthSlider);
@@ -107,12 +126,14 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     roomValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "ROOMSIZE", roomSlider);
     wetValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WET", wetSlider);
     widthValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "WIDTH", widthSlider);
-    buttonValue = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "BUTTON", openButton);
+    widthValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "IRLENGTH", IRLengthSlider);
+    //buttonValue = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "BUTTON", openButton);
 
     filterMenuValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "FILTERMENU", filterMenu);
     phaserMenuValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "PHASERMENU", phaserMenu);
     ImpulseValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "IMPULSEMENU", impulseMenu);
-    phaserMenuValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "REVERBMENU", reverbType);
+    reverbValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "REVERBMENU", reverbType);
+    emulatedImpulseValue = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.apvts, "EMULATEDMENU", emulatedImpulseMenu);
     
 }
 
@@ -136,10 +157,10 @@ void A3AudioProcessorEditor::paint (juce::Graphics& g)
     g.drawRect(innerArea, 1.0f);
     
     int innerWidth = innerArea.getWidth();
-    g.drawText("Cutoff", cutOffSlider.getX() - 10, cutOffSlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
-    g.drawText("Rate", rateSlider.getX() - 10, rateSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
-    g.drawText("Depth", depthSlider.getX() - 10, depthSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
-    g.drawText("Gain", gainSlider.getX() - 10, gainSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
+    //g.drawText("Cutoff", cutOffSlider.getX() - 10, cutOffSlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
+    //g.drawText("Rate", rateSlider.getX() - 10, rateSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
+    //g.drawText("Depth", depthSlider.getX() - 10, depthSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
+    //g.drawText("Gain", gainSlider.getX() - 10, gainSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     //reverb
     //g.drawText("Damping", dampSlider.getX() - 10 , dampSlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
     g.drawText("Dry", drySlider.getX() - 10, drySlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
@@ -147,7 +168,8 @@ void A3AudioProcessorEditor::paint (juce::Graphics& g)
     g.drawText("Room size", roomSlider.getX() - 10, roomSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     g.drawText("Wet", wetSlider.getX() - 10, wetSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     g.drawText("Width", widthSlider.getX() - 10, widthSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
-    
+
+    g.drawText("Length of Reverberation", IRLengthSlider.getX() - 10, IRLengthSlider.getY(), innerWidth / 4, 25, juce::Justification::centred);
 }
 
 void A3AudioProcessorEditor::resized()
@@ -155,35 +177,41 @@ void A3AudioProcessorEditor::resized()
     juce::Rectangle<int> area = getLocalBounds().reduced(40);
     juce::Rectangle<int> menus = area.removeFromTop(20);
     int width = menus.getWidth();
-    filterMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
-    phaserMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
-    reverbType.setBounds(menus.removeFromLeft(width / 4 - 5));
-    impulseMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
-    openButton.setBounds(impulseMenu.getX(), impulseMenu.getY() + 40, impulseMenu.getWidth() , 50);
-    cutOffSlider.setBounds (35 , 90, width / 6 - 10, 100);
-    rateSlider.setBounds (125, 90, width / 6 - 10, 100);
-    depthSlider.setBounds (205, 90, width / 6 - 10, 100);
-    gainSlider.setBounds (290, 90, width / 6 - 10, 100);
+    //filterMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
+    //phaserMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
+    reverbType.setBounds(menus.removeFromLeft(width / 3 - 5));
+    impulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
+    emulatedImpulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
+    openButton.setBounds(impulseMenu.getX(), impulseMenu.getY() + 40, impulseMenu.getWidth() , 40);
+    //cutOffSlider.setBounds (35 , 130, width / 6 - 10, 100);
+    //rateSlider.setBounds (125, 130, width / 6 - 10, 100);
+    //depthSlider.setBounds (205, 130, width / 6 - 10, 100);
+    //gainSlider.setBounds (290, 130, width / 6 - 10, 100);
     //reverb
     //dampSlider.setBounds(35, 180, width / 6 - 10, 100);
-    drySlider.setBounds(35, 180, width / 6 - 10, 100);
+    drySlider.setBounds(35, 140, width / 6 - 10, 100);
     //freezeSlider.setBounds(205, 180, width / 6 - 10, 100);
-    roomSlider.setBounds(125, 180, width / 6 - 10, 100);
-    wetSlider.setBounds(205, 180, width / 6 - 10, 100);
-    widthSlider.setBounds(290, 180, width / 6 - 10, 100);
+    roomSlider.setBounds(125, 140, width / 6 - 10, 100);
+    wetSlider.setBounds(205, 140, width / 6 - 10, 100);
+    widthSlider.setBounds(290, 140, width / 6 - 10, 100);
+    IRLengthSlider.setBounds(emulatedImpulseMenu.getX(), emulatedImpulseMenu.getY() + 30, width / 4 - 10, 100);
 }
 
-//void A3AudioProcessorEditor::buttonClicked() {
-//    juce::FileChooser chooser("Select a Wave file to play...", {}, "*.wav");                                        
-//
-//    if (chooser.browseForFileToOpen())                                          
-//    {
-//
-//        auto file = chooser.getResult();                                        
-//        audioProcessor.userfile = file;
-//        impulseMenu.setSelectedId(7);
-//
-//
-//    }
-//
-//}
+void A3AudioProcessorEditor::buttonClicked() {
+    juce::FileChooser chooser("Select a Wave file to play...", {}, "*.wav");                                        
+
+    if (chooser.browseForFileToOpen())                                          
+    {
+
+        auto file = chooser.getResult();                                        
+        audioProcessor.userfile = file;
+        if (file.exists()) {
+            //int numfiles = audioProcessor.desktop.getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("Resources").getNumberOfChildFiles(3, "*.wav");
+            impulseMenu.changeItemText(9, file.getFileNameWithoutExtension());
+            impulseMenu.setSelectedId(9);
+            impulseMenu.setText(file.getFileNameWithoutExtension());
+        }
+
+    }
+
+}

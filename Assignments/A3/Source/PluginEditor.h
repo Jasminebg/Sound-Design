@@ -37,6 +37,7 @@ private:
     juce::ComboBox phaserMenu;
     juce::ComboBox impulseMenu;
     juce::ComboBox reverbType;
+    juce::ComboBox emulatedImpulseMenu;
     //reverb
     //juce::Slider dampSlider;
     juce::Slider drySlider;
@@ -44,8 +45,9 @@ private:
     juce::Slider roomSlider;
     juce::Slider wetSlider;
     juce::Slider widthSlider;
+    juce::Slider IRLengthSlider;
      
-    juce::TextButton openButton{"Open file.."};
+    juce::TextButton openButton{"Open IR Wave file.."};
 
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> cutOffValue;
@@ -56,6 +58,8 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> phaserMenuValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ImpulseValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> reverbValue;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> emulatedImpulseValue;
+
     //reverb
     //std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dryValue;
