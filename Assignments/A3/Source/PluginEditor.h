@@ -33,6 +33,7 @@ private:
     juce::Slider rateSlider;
     juce::Slider depthSlider;
     juce::Slider gainSlider;
+    juce::Slider delaySlider;
     juce::ComboBox filterMenu;
     juce::ComboBox phaserMenu;
     juce::ComboBox impulseMenu;
@@ -54,6 +55,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rateValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> depthValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainValue;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> filterMenuValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> phaserMenuValue;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ImpulseValue;

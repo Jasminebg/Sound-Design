@@ -30,14 +30,14 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     //addAndMakeVisible(&phaserMenu);
 
     emulatedImpulseMenu.setJustificationType(juce::Justification::centred);
-    emulatedImpulseMenu.addItem("No Emulated IR", 1);
+    emulatedImpulseMenu.addItem("Emulated IR Off", 1);
     emulatedImpulseMenu.addItem("Fast Decay IR", 2);
     emulatedImpulseMenu.addItem("Slow Decay IR", 3);
     addAndMakeVisible(&emulatedImpulseMenu);
 
     reverbType.setJustificationType(juce::Justification::centred);
     reverbType.addItem("No Reverb", 1);
-    reverbType.addItem("Reverb 1", 2);
+    reverbType.addItem("Basic Reverb", 2);
     reverbType.addItem("Recorded Impulse Response", 3);
     reverbType.addItem("Constructed Impulse Response", 4);
     reverbType.addItem("Simluation Reverb", 5);
@@ -46,7 +46,7 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
 
     impulseMenu.setJustificationType(juce::Justification::centred);
     //auto files = juce::File::getSpecialLocation(juce::File::userDesktopDirectory).getChildFile("Resources").findChildFiles(3, true, "*.wav");
-    impulseMenu.addItem("Impulse: Off", 1);
+    impulseMenu.addItem("Impulse Response: Off", 1);
  /*   for (int i = 0; i < files.size(); i++) {
         impulseMenu.addItem(files[i].getFileNameWithoutExtension(), i + 1);
     }*/
@@ -63,11 +63,16 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     addAndMakeVisible(&impulseMenu);
 
     
-    //cutOffSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    //cutOffSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    //cutOffSlider.setPopupDisplayEnabled(true, true, this);
-    //addAndMakeVisible(&cutOffSlider);
-    //
+    cutOffSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    cutOffSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    cutOffSlider.setPopupDisplayEnabled(true, true, this);
+    addAndMakeVisible(&cutOffSlider);
+    delaySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    delaySlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    delaySlider.setPopupDisplayEnabled(true, true, this);
+    addAndMakeVisible(&delaySlider);
+
+
     //rateSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
     //rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     //rateSlider.setPopupDisplayEnabled(true, true, this);
@@ -119,6 +124,7 @@ A3AudioProcessorEditor::A3AudioProcessorEditor (A3AudioProcessor& p)
     rateValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "PHASERRATE", rateSlider);
     depthValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "PHASERDEPTH", depthSlider);
     gainValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "GAIN", gainSlider);
+    gainValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "DELAY", delaySlider);
     //reverb
     //dampValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "DAMPING", dampSlider);
     dryValue = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "DRYLEVEL", drySlider);
@@ -157,7 +163,7 @@ void A3AudioProcessorEditor::paint (juce::Graphics& g)
     g.drawRect(innerArea, 1.0f);
     
     int innerWidth = innerArea.getWidth();
-    //g.drawText("Cutoff", cutOffSlider.getX() - 10, cutOffSlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
+    g.drawText("Cutoff", cutOffSlider.getX() - 10, cutOffSlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
     //g.drawText("Rate", rateSlider.getX() - 10, rateSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     //g.drawText("Depth", depthSlider.getX() - 10, depthSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     //g.drawText("Gain", gainSlider.getX() - 10, gainSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
@@ -168,8 +174,9 @@ void A3AudioProcessorEditor::paint (juce::Graphics& g)
     g.drawText("Room size", roomSlider.getX() - 10, roomSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     g.drawText("Wet", wetSlider.getX() - 10, wetSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
     g.drawText("Width", widthSlider.getX() - 10, widthSlider.getY() - 10,  innerWidth / 6, 25, juce::Justification::centred);
+    g.drawText("Delay time ", delaySlider.getX() - 10, delaySlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
 
-    g.drawText("Length of Reverberation", IRLengthSlider.getX() - 10, IRLengthSlider.getY(), innerWidth / 4, 25, juce::Justification::centred);
+    g.drawText("Length of Emulated IR Reverb", IRLengthSlider.getX() , IRLengthSlider.getY(), innerWidth / 3, 25, juce::Justification::centred);
 }
 
 void A3AudioProcessorEditor::resized()
@@ -183,7 +190,6 @@ void A3AudioProcessorEditor::resized()
     impulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
     emulatedImpulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
     openButton.setBounds(impulseMenu.getX(), impulseMenu.getY() + 40, impulseMenu.getWidth() , 40);
-    //cutOffSlider.setBounds (35 , 130, width / 6 - 10, 100);
     //rateSlider.setBounds (125, 130, width / 6 - 10, 100);
     //depthSlider.setBounds (205, 130, width / 6 - 10, 100);
     //gainSlider.setBounds (290, 130, width / 6 - 10, 100);
@@ -192,8 +198,10 @@ void A3AudioProcessorEditor::resized()
     drySlider.setBounds(35, 140, width / 6 - 10, 100);
     //freezeSlider.setBounds(205, 180, width / 6 - 10, 100);
     roomSlider.setBounds(125, 140, width / 6 - 10, 100);
-    wetSlider.setBounds(205, 140, width / 6 - 10, 100);
-    widthSlider.setBounds(290, 140, width / 6 - 10, 100);
+    wetSlider.setBounds(215, 140, width / 6 - 10, 100);
+    widthSlider.setBounds(305, 140, width / 6 - 10, 100);
+    cutOffSlider.setBounds(395, 140, width / 6 - 10, 100);
+    delaySlider.setBounds(395, 140, width / 6 - 10, 100);
     IRLengthSlider.setBounds(emulatedImpulseMenu.getX(), emulatedImpulseMenu.getY() + 30, width / 4 - 10, 100);
 }
 

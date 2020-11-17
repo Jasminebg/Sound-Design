@@ -20,6 +20,7 @@ public:
     juce::File desktop;
     juce::File irfile, lastir;
     int reverbType;
+    float irLength, lastIRL;
     juce::AudioBuffer<float> outbuffer;
     juce::AudioBuffer<float> irBuffer;
     //juce::Array<juce::File> impulses;
@@ -62,6 +63,7 @@ public:
     void decreasing(juce::AudioBuffer<float>& buffer );
     void updateFX();
     void updateParameters ();
+    void delayline(juce::AudioBuffer<float>& buffer, juce::dsp::ProcessContextNonReplacing<float>);
     juce::AudioProcessorValueTreeState apvts;
 
     void fillreverb(int channel, const int numSamples, const int delayBufferLen, const float* bufferData, const float* delayBufferData);
@@ -82,7 +84,7 @@ private:
     enum { ccIndex };
     juce::dsp::ProcessorChain<juce::dsp::Convolution> constructedIR;
     bool bypassPhaser = false;
-    
+    juce::dsp::ProcessSpec gspec;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (A3AudioProcessor)
 };
