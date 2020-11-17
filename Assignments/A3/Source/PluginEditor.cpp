@@ -201,7 +201,7 @@ void A3AudioProcessorEditor::resized()
     wetSlider.setBounds(215, 140, width / 6 - 10, 100);
     widthSlider.setBounds(305, 140, width / 6 - 10, 100);
     cutOffSlider.setBounds(395, 140, width / 6 - 10, 100);
-    delaySlider.setBounds(395, 140, width / 6 - 10, 100);
+    delaySlider.setBounds(485, 140, width / 6 - 10, 100);
     IRLengthSlider.setBounds(emulatedImpulseMenu.getX(), emulatedImpulseMenu.getY() + 30, width / 4 - 10, 100);
 }
 

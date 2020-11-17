@@ -104,7 +104,7 @@ void A3AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     //tmpblock = juce::dsp::AudioBlock<float>( heapblock, spec.numChannels, spec.maximumBlockSize);
     sRate = sampleRate;
     sBlock = samplesPerBlock;
-    outbuffer.setSize(2,  sampleRate+ samplesPerBlock);
+    outbuffer.setSize(2, sampleRate + samplesPerBlock);
     outbuffer.clear();
     stateVariableFilter.reset();
     fxChain.reset();
@@ -206,10 +206,11 @@ void A3AudioProcessor::updateFX()
                 if (irfile != lastir  ) {
                     lastir = irfile;
                     //DBG("file " << irfile.getFileName());
+                    convolution.reset();
                     convolution.loadImpulseResponse(juce::File(irfile),
                         juce::dsp::Convolution::Stereo::yes,
                         juce::dsp::Convolution::Trim::no,
-                        0);
+                        1024);
                 }
         //}
         }
@@ -277,14 +278,17 @@ void A3AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::Midi
     if (reverbType == 3) {
         //fxChain.template get<convoIndex>().reset();
         fxChain.template get<convoIndex>().process(cont);
+        //block.copyFrom(cont.getInputBlock()).copyFrom(cont.getOutputBlock());
         //block.copyFrom(cont.getOutputBlock()).add(cont.getInputBlock());
-        //block.copyFrom(outblock);
+        //block.add(block.copyFrom(context.getOutputBlock()));
         for (auto i = 0; i < totalNumInputChannels; ++i) {
             float* data = buffer.getWritePointer(i);
             float* outdata = outbuffer.getWritePointer(i);
-            //fillreverb(i, numSamples, outNumSamples, cont.getOutputBlock().getChannelPointer(i), outdata);
-            //fillbuffer(buffer, i, numSamples, outNumSamples, outdata);
-            buffer.copyFrom(i, 0, cont.getOutputBlock().getChannelPointer(i), numSamples);
+            //fillreverb(i, numSamples, outNumSamples, cont.getInputBlock().getChannelPointer(i), outdata);
+            fillreverb(i, numSamples, outNumSamples, cont.getOutputBlock().getChannelPointer(i), outdata);
+            fillbuffer(buffer, i, numSamples, outNumSamples, outdata);
+            //buffer.copyFrom(i, 0, cont.getInputBlock().getChannelPointer(i), numSamples);
+            //buffer.copyFrom(i,0, cont.getOutputBlock().getChannelPointer(i), numSamples);
             //buffer.addFrom(i, numSamples, cont.getInputBlock().getChannelPointer(i), numSamples);
         }
     }
@@ -299,10 +303,10 @@ void A3AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::Midi
             float* data = buffer.getWritePointer(i);
             float* outdata = outbuffer.getWritePointer(i);
             //DBG("cns" << cont.getOutputBlock().getNumSamples());
-            //fillreverb(i, numSamples, outNumSamples, cont.getOutputBlock().getChannelPointer(i), outdata);
-            //fillbuffer(buffer, i, numSamples, outNumSamples, outdata);
+            fillreverb(i, numSamples, outNumSamples, cont.getOutputBlock().getChannelPointer(i), outdata);
+            fillbuffer(buffer, i, numSamples, outNumSamples, outdata);
 
-            buffer.addFrom(i, 0, cont.getOutputBlock().getChannelPointer(i), numSamples);
+            //buffer.addFrom(i, 0, cont.getOutputBlock().getChannelPointer(i), numSamples);
             //buffer.addFrom(i, 0, cont.getInputBlock().getChannelPointer(i), numSamples);
         }
     }
@@ -320,13 +324,15 @@ void A3AudioProcessor::delayline(juce::AudioBuffer<float>& buffer, juce::dsp::Pr
     float cutoff = *apvts.getRawParameterValue("CUTOFF");
     float delay = *apvts.getRawParameterValue("DELAY");
 
-    Delay<int, 2> delays;
-    delays.prepare(gspec);
-    delays.setMaxDelayTime(1);
-    delays.setDelayTime(1, delay);
-    delays.setFeedback(1);
-    delays.setWetLevel(1)
-    delays.process(context);
+    //Delay<int, 2> delays;
+    //delays.prepare(gspec);
+    //delays.setMaxDelayTime(1);
+    //delays.setDelayTime(1, delay);
+    //delays.setFeedback(1);
+    //delays.setWetLevel(1);
+    //delays.process(context);
+    //DSPTutorialAudioProcessor
+    //juce::dsp::DelayLine delays;
     
 
     
@@ -337,7 +343,7 @@ void A3AudioProcessor::delayline(juce::AudioBuffer<float>& buffer, juce::dsp::Pr
 void A3AudioProcessor::decreasing(juce::AudioBuffer<float>& buffer) {
     float emir = *apvts.getRawParameterValue("EMULATEDMENU");
     //float irlength = *apvts.getRawParameterValue("IRLENGTH");
-    float decayspeed = -5;
+    float decayspeed = 0;
     if (emir == 2) decayspeed = -7;
     if (emir == 3) decayspeed = -3.5;
     
@@ -376,12 +382,12 @@ void A3AudioProcessor::fillreverb(int channel, const int numSamples, const int d
                                         const float* bufferData, const float* delayBufferData) {
 
     if (delayBufferLen > numSamples + WritePosition) {
-        outbuffer.copyFromWithRamp(channel, WritePosition, bufferData, numSamples, 1, 1);
+        outbuffer.copyFromWithRamp(channel, WritePosition, bufferData, numSamples, 1, 0.2);
     }
     else {
         const int bufferRemainder = delayBufferLen - WritePosition;
-        outbuffer.copyFromWithRamp(channel, bufferRemainder, bufferData, bufferRemainder, 1,1);
-        outbuffer.copyFromWithRamp(channel, 0, bufferData, delayBufferLen - bufferRemainder,1,1);
+        outbuffer.copyFromWithRamp(channel, bufferRemainder, bufferData, bufferRemainder, 1,0.2);
+        outbuffer.copyFromWithRamp(channel, 0, bufferData, delayBufferLen - bufferRemainder,1,0.2);
 
     }
 
@@ -392,12 +398,12 @@ void A3AudioProcessor::fillbuffer(juce::AudioBuffer<float>& buffer, int channel,
     int readPosition = (int) (delayBufferLen + WritePosition - (sRate*1000)) % delayBufferLen;
     //DBG(readPosition);
     if (delayBufferLen > numSamples + readPosition) {
-        buffer.copyFrom(channel, 0, delayBufferData + readPosition, numSamples);
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, numSamples);
     }
     else {
         const int delayRemainder = delayBufferLen - WritePosition;
-        buffer.copyFrom(channel, 0, delayBufferData +readPosition , delayRemainder);
-        buffer.copyFrom(channel, delayRemainder, delayBufferData, numSamples - delayRemainder);
+        buffer.addFrom(channel, 0, delayBufferData +readPosition , delayRemainder);
+        buffer.addFrom(channel, delayRemainder, delayBufferData, numSamples - delayRemainder);
     }
 }
 
