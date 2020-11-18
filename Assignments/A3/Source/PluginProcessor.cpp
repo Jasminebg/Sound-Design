@@ -314,15 +314,7 @@ void A3AudioProcessor::delayline(juce::AudioBuffer<float>& buffer, juce::dsp::Pr
     float cutoff = *apvts.getRawParameterValue("CUTOFF");
     float delay = *apvts.getRawParameterValue("DELAY");
 
-    //Delay<int, 2> delays;
-    //delays.prepare(gspec);
-    //delays.setMaxDelayTime(1);
-    //delays.setDelayTime(1, delay);
-    //delays.setFeedback(1);
-    //delays.setWetLevel(1);
-    //delays.process(context);
-    //DSPTutorialAudioProcessor
-    //juce::dsp::DelayLine delays;
+    
     
     //stateVariableFilter.setCutoffFrequency(cutoff);
 

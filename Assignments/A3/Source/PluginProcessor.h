@@ -83,6 +83,8 @@ private:
     juce::dsp::ProcessorChain<juce::dsp::Phaser<float>,juce::dsp::Gain<float>, juce::dsp::Reverb, juce::dsp::Convolution> fxChain;
     enum { ccIndex };
     juce::dsp::ProcessorChain<juce::dsp::Convolution> constructedIR;
+    enum {svtIndex, delayIndex };
+    //juce::dsp::ProcessorChain<juce::dsp::StateVariableTPTFilter<float> > simulatedIR;
     bool bypassPhaser = false;
     juce::dsp::ProcessSpec gspec;
     //==============================================================================

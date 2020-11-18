@@ -178,7 +178,7 @@ void A3AudioProcessorEditor::paint(juce::Graphics& g)
     g.drawText("Width", widthSlider.getX() - 10, widthSlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
     g.drawText("Delay time ", delaySlider.getX() - 10, delaySlider.getY() - 10, innerWidth / 6, 25, juce::Justification::centred);
 
-    g.drawText("Length of Emulated IR Reverb \n (Warning: There may be loud noises)", emulatedImpulseMenu.getX() + 5, IRLengthSlider.getY()+5, innerWidth / 3, 40, juce::Justification::centred);
+    g.drawText("Length of Emulated IR Reverb", IRLengthSlider.getX()-20, IRLengthSlider.getY()-20, innerWidth / 3, 30, juce::Justification::centred);
 }
 
 void A3AudioProcessorEditor::resized()
@@ -190,7 +190,8 @@ void A3AudioProcessorEditor::resized()
     //phaserMenu.setBounds(menus.removeFromLeft(width / 4 - 5));
     reverbType.setBounds(menus.removeFromLeft(width / 3 - 5));
     impulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
-    emulatedImpulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
+    //emulatedImpulseMenu.setBounds(menus.removeFromLeft(width / 3 - 5));
+    emulatedImpulseMenu.setBounds(impulseMenu.getX()+ impulseMenu.getWidth(), impulseMenu.getY(), impulseMenu.getWidth(), 20);
     openButton.setBounds(impulseMenu.getX(), impulseMenu.getY() + 40, impulseMenu.getWidth(), 40);
     //rateSlider.setBounds (125, 130, width / 6 - 10, 100);
     //depthSlider.setBounds (205, 130, width / 6 - 10, 100);
@@ -204,7 +205,7 @@ void A3AudioProcessorEditor::resized()
     widthSlider.setBounds(490, 140, width / 6 - 10, 100);
     cutOffSlider.setBounds(260, 280, width /6 - 10, 100);
     delaySlider.setBounds( 375, 280, width / 6 - 10, 100);
-    IRLengthSlider.setBounds(emulatedImpulseMenu.getX(), emulatedImpulseMenu.getY() + 30, width / 4 - 10, 100);
+    IRLengthSlider.setBounds(emulatedImpulseMenu.getX()+10, emulatedImpulseMenu.getY() +70, width /  3 - 20, 20);
 }
 
 void A3AudioProcessorEditor::buttonClicked() {
