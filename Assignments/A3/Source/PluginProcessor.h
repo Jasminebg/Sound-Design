@@ -19,8 +19,9 @@ public:
     juce::File userfile;
     juce::File desktop;
     juce::File irfile, lastir;
-    int reverbType;
-    float irLength, lastIRL;
+    int reverbType, emir, lastemir;
+    bool r4change;
+    float irLength,  decayspeed;
     juce::AudioBuffer<float> outbuffer;
     juce::AudioBuffer<float> irBuffer;
     //juce::Array<juce::File> impulses;
@@ -66,9 +67,8 @@ public:
     void delayline(juce::AudioBuffer<float>& buffer, juce::dsp::ProcessContextNonReplacing<float>);
     juce::AudioProcessorValueTreeState apvts;
 
-    void fillreverb(int channel, const int numSamples, const int delayBufferLen, const float* bufferData, const float* delayBufferData);
-    void fillbuffer(juce::AudioBuffer<float>& buffer, int channel, const int numSamples,
-        const int delayBufferLen,  const float* delayBufferData);
+    void gainup(float* data, int numsamples);
+
 
 private:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

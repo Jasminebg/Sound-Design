@@ -14,14 +14,14 @@
 //==============================================================================
 A3AudioProcessor::A3AudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       ), apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+    ), apvts(*this, nullptr, "PARAMETERS", createParameterLayout())
 #endif
 {
 }
@@ -38,29 +38,29 @@ const juce::String A3AudioProcessor::getName() const
 
 bool A3AudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool A3AudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool A3AudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double A3AudioProcessor::getTailLengthSeconds() const
@@ -79,23 +79,23 @@ int A3AudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void A3AudioProcessor::setCurrentProgram (int index)
+void A3AudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String A3AudioProcessor::getProgramName (int index)
+const juce::String A3AudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void A3AudioProcessor::changeProgramName (int index, const juce::String& newName)
+void A3AudioProcessor::changeProgramName(int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void A3AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void A3AudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    
+
     juce::dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
@@ -126,6 +126,7 @@ void A3AudioProcessor::updateFX()
     float phaserRate = *apvts.getRawParameterValue("PHASERRATE");
     float phaserDepth = *apvts.getRawParameterValue("PHASERDEPTH");
     float gain = *apvts.getRawParameterValue("GAIN");
+    float tmpemir = *apvts.getRawParameterValue("EMULATEDMENU");
 
     //float damp = *apvts.getRawParameterValue("DAMPING");
     float dry = *apvts.getRawParameterValue("DRYLEVEL");
@@ -137,10 +138,14 @@ void A3AudioProcessor::updateFX()
     //float openfile = *apvts.getRawParameterValue("BUTTON");
     //DBG("openfile " << openfile);
     if (length != irLength) {
-        lastIRL = irLength;
+        r4change = true;
         irLength = length;
     }
-    else { irLength = length; }
+
+    if (emir != tmpemir) {
+        r4change = true;
+        emir = tmpemir;
+    }
 
 
     bypassFilter = false;
@@ -148,13 +153,13 @@ void A3AudioProcessor::updateFX()
     if (filterChoice == 2) stateVariableFilter.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
     if (filterChoice == 3) stateVariableFilter.setType(juce::dsp::StateVariableTPTFilterType::highpass);
     if (filterChoice == 4) bypassFilter = true;
-    //stateVariableFilter.setCutoffFrequency(cutoff);
+    stateVariableFilter.setCutoffFrequency(cutoff);
 
     if (phaserChoice == 1) bypassPhaser = false;
     if (phaserChoice == 2) bypassPhaser = true;
 
     auto& gainProcessor = fxChain.template get<gainIndex>();
-    gainProcessor.setGainLinear(gain);
+    gainProcessor.setGainLinear(2);
 
     auto& phaserProcessor = fxChain.template get<phaserIndex>();
     phaserProcessor.setRate(phaserRate);
@@ -169,51 +174,42 @@ void A3AudioProcessor::updateFX()
         revpar.wetLevel = wet;
         revpar.width = width;
         verb.setParameters(revpar);
-        //DBG("dry " << dry);
-        //DBG("room " << room);
-        //DBG("wet " << wet);
-        //DBG("width " << width);
+
     }
-    //else if(reverbType > 2) {
-    //    revpar.dryLevel = 1;
-    //    revpar.roomSize = 0.2;
-    //    revpar.wetLevel = 1;
 
-    //}
 
-    
-    
+
     if (reverbType == 3) {
-  
-        //DBG("if " << ((lastir != irfile || !irfile.exists())? "true" : "False" ));
-            auto& convolution = fxChain.template get<convoIndex>();
-            //juce::File desktop;
-            juce::File tempir;
-            if (impulseChoice == 1) convolution.reset();
-            if (impulseChoice == 2) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Direct Cabinet N1.wav");
-            if (impulseChoice == 3) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Deep Space.wav");
-            if (impulseChoice == 4) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Chateau de Logne, Outside.wav");
-            if (impulseChoice == 5) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Small Drum Room.wav");
-            if (impulseChoice == 6) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Bottle Hall.wav");
-            if (impulseChoice == 7) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("cassette recorder.wav");
-            if (impulseChoice == 8) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("guitar amp.wav");
-            if (impulseChoice == 9) tempir = userfile;
-            //DBG("fc  " << filterChoice);
-            //DBG("bp  "<<phaserChoice);
-            //DBG("choice " << impulseChoice);
 
-                irfile = tempir;
-                if (irfile != lastir  ) {
-                    lastir = irfile;
-                    //DBG("file " << irfile.getFileName());
-                    convolution.reset();
-                    convolution.loadImpulseResponse(juce::File(irfile),
-                        juce::dsp::Convolution::Stereo::yes,
-                        juce::dsp::Convolution::Trim::no,
-                        1024);
-                }
-        //}
+        //DBG("if " << ((lastir != irfile || !irfile.exists())? "true" : "False" ));
+        auto& convolution = fxChain.template get<convoIndex>();
+
+        juce::File tempir;
+        if (impulseChoice == 1) convolution.reset();
+        if (impulseChoice == 2) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Parking Garage.wav");
+        if (impulseChoice == 3) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("St Nicolaes Church.wav");
+        if (impulseChoice == 4) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Large Wide Echo Hall.wav");
+        if (impulseChoice == 5) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Conic Long Echo Hall.wav");
+        if (impulseChoice == 6) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("On a Star.wav");
+        if (impulseChoice == 7) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("Large Long Echo Hall.wav");
+        if (impulseChoice == 8) tempir = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getChildFile("In a Silo.wav");
+        if (impulseChoice == 9) tempir = userfile;
+        //DBG("fc  " << filterChoice);
+        //DBG("bp  "<<phaserChoice);
+        //DBG("choice " << impulseChoice);
+
+        irfile = tempir;
+        if (irfile != lastir) {
+            lastir = irfile;
+            //DBG("file " << irfile.getFileName());
+            convolution.reset();
+            convolution.loadImpulseResponse(juce::File(irfile),
+                juce::dsp::Convolution::Stereo::yes,
+                juce::dsp::Convolution::Trim::no,
+                sRate);
+
         }
+    }
 
 }
 
@@ -227,26 +223,26 @@ void A3AudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool A3AudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool A3AudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+#if JucePlugin_IsMidiEffect
+    juce::ignoreUnused(layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
@@ -270,52 +266,46 @@ void A3AudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::Midi
     juce::dsp::ProcessContextReplacing<float> context(block);
 
     juce::dsp::ProcessContextNonReplacing<float> cont(block, outblock);
-
     if (!bypassFilter) stateVariableFilter.process(context);
-    if (!bypassPhaser) fxChain.template get<gainIndex>().process(context);
-    //DBG("rt " << reverbType);
+    //if (!bypassPhaser)     fxChain.template get<gainIndex>().process(context);
+
     if (reverbType == 2) fxChain.template get<reverbIndex>().process(context);
     if (reverbType == 3) {
-        //fxChain.template get<convoIndex>().reset();
+
         fxChain.template get<convoIndex>().process(cont);
-        //block.copyFrom(cont.getInputBlock()).copyFrom(cont.getOutputBlock());
-        //block.copyFrom(cont.getOutputBlock()).add(cont.getInputBlock());
-        //block.add(block.copyFrom(context.getOutputBlock()));
+
         for (auto i = 0; i < totalNumInputChannels; ++i) {
-            float* data = buffer.getWritePointer(i);
-            float* outdata = outbuffer.getWritePointer(i);
-            //fillreverb(i, numSamples, outNumSamples, cont.getInputBlock().getChannelPointer(i), outdata);
-            fillreverb(i, numSamples, outNumSamples, cont.getOutputBlock().getChannelPointer(i), outdata);
-            fillbuffer(buffer, i, numSamples, outNumSamples, outdata);
-            //buffer.copyFrom(i, 0, cont.getInputBlock().getChannelPointer(i), numSamples);
-            //buffer.copyFrom(i,0, cont.getOutputBlock().getChannelPointer(i), numSamples);
-            //buffer.addFrom(i, numSamples, cont.getInputBlock().getChannelPointer(i), numSamples);
+            buffer.addFrom(i, 0, cont.getOutputBlock().getChannelPointer(i), numSamples);
+
         }
     }
-    if (reverbType == 4){
+    if (reverbType == 4) {
         irfile = juce::File();
 
-        //fxChain.template get<convoIndex>().reset();
-        if(irLength != lastIRL)  decreasing(buffer);
-        //fxChain.template get<convoIndex>().process(cont);
+        if (r4change)  decreasing(buffer);
+
         constructedIR.template get<ccIndex>().process(cont);
         for (auto i = 0; i < totalNumInputChannels; ++i) {
-            float* data = buffer.getWritePointer(i);
-            float* outdata = outbuffer.getWritePointer(i);
-            //DBG("cns" << cont.getOutputBlock().getNumSamples());
-            fillreverb(i, numSamples, outNumSamples, cont.getOutputBlock().getChannelPointer(i), outdata);
-            fillbuffer(buffer, i, numSamples, outNumSamples, outdata);
+            buffer.addFrom(i, 0, cont.getOutputBlock().getChannelPointer(i), numSamples);
 
-            //buffer.addFrom(i, 0, cont.getOutputBlock().getChannelPointer(i), numSamples);
-            //buffer.addFrom(i, 0, cont.getInputBlock().getChannelPointer(i), numSamples);
         }
     }
-    if (reverbType == 5){
+    if (reverbType == 5) {
         //auto sd = delay
     }
 
     WritePosition += numSamples;
     WritePosition %= outNumSamples;
+
+}
+
+void A3AudioProcessor::gainup(float* data, int numsamples) {
+
+    for (int i = 0; i < numsamples; ++i) {
+        //DBG("pre"<< data[i]);
+        data[i] *= 2;
+        //DBG("post" << data[i]);
+    }
 
 }
 
@@ -334,21 +324,18 @@ void A3AudioProcessor::delayline(juce::AudioBuffer<float>& buffer, juce::dsp::Pr
     //DSPTutorialAudioProcessor
     //juce::dsp::DelayLine delays;
     
-
-    
     //stateVariableFilter.setCutoffFrequency(cutoff);
 
 }
 
 void A3AudioProcessor::decreasing(juce::AudioBuffer<float>& buffer) {
-    float emir = *apvts.getRawParameterValue("EMULATEDMENU");
-    //float irlength = *apvts.getRawParameterValue("IRLENGTH");
+
     float decayspeed = 0;
     if (emir == 2) decayspeed = -7;
     if (emir == 3) decayspeed = -3.5;
-    
-    //irBuffer.makeCopyOf(buffer);
-    irBuffer.setSize(buffer.getNumChannels(), buffer.getNumSamples()*irLength );
+    if (emir == 1) irLength = 0;
+
+    irBuffer.setSize(buffer.getNumChannels(), buffer.getNumSamples() * irLength);
     irBuffer.clear();
     auto& convolution = constructedIR.template get<ccIndex>();
     auto eul = juce::MathConstants<float>::euler;
@@ -357,55 +344,18 @@ void A3AudioProcessor::decreasing(juce::AudioBuffer<float>& buffer) {
         float* data = irBuffer.getWritePointer(i);
         //DBG("num " << irBuffer.getNumSamples());
         for (int i = 0; i < irBuffer.getNumSamples(); ++i) {
-            float exponent = (float)(decayspeed * i) / (float)(irBuffer.getNumSamples()* irLength+0.0001);
+            float exponent = (float)(decayspeed * i) / (float)(irBuffer.getNumSamples() * irLength);
             float randomvalue = (float)(rand() % 10000) * 0.0001f;
             data[i] = pow(eul, exponent);
             data[i] *= randomvalue;
-
-            //if (data[i] > 0) {
-                //DBG("i  " << i);
-                //DBG("exp " <<  exponent);
-                //DBG("data " << data[i]);
-                //DBG("v  " << randomvalue);
-            //}
-            //data[irBuffer.getNumSamples() - 1 - i] = ( 1 / (float)irBuffer.getNumSamples() )* (float)i;
-            //data[irBuffer.getNumSamples() - 1 - i] *= (rand() % 10000) * 0.0001f;
         }
     }
-     convolution.loadImpulseResponse(juce::AudioBuffer<float>(irBuffer),sRate,juce::dsp::Convolution::Stereo::yes,
-                                    juce::dsp::Convolution::Trim::no,juce::dsp::Convolution::Normalise::no);
+    convolution.loadImpulseResponse(juce::AudioBuffer<float>(irBuffer), sRate, juce::dsp::Convolution::Stereo::yes,
+        juce::dsp::Convolution::Trim::no, juce::dsp::Convolution::Normalise::no);
+    r4change = false;
 }
 
 
-
-void A3AudioProcessor::fillreverb(int channel, const int numSamples, const int delayBufferLen,
-                                        const float* bufferData, const float* delayBufferData) {
-
-    if (delayBufferLen > numSamples + WritePosition) {
-        outbuffer.copyFromWithRamp(channel, WritePosition, bufferData, numSamples, 1, 0.2);
-    }
-    else {
-        const int bufferRemainder = delayBufferLen - WritePosition;
-        outbuffer.copyFromWithRamp(channel, bufferRemainder, bufferData, bufferRemainder, 1,0.2);
-        outbuffer.copyFromWithRamp(channel, 0, bufferData, delayBufferLen - bufferRemainder,1,0.2);
-
-    }
-
-}
-
-void A3AudioProcessor::fillbuffer(juce::AudioBuffer<float>& buffer, int channel, const int numSamples,
-    const int delayBufferLen, const float* delayBufferData) {
-    int readPosition = (int) (delayBufferLen + WritePosition - (sRate*1000)) % delayBufferLen;
-    //DBG(readPosition);
-    if (delayBufferLen > numSamples + readPosition) {
-        buffer.addFrom(channel, 0, delayBufferData + readPosition, numSamples);
-    }
-    else {
-        const int delayRemainder = delayBufferLen - WritePosition;
-        buffer.addFrom(channel, 0, delayBufferData +readPosition , delayRemainder);
-        buffer.addFrom(channel, delayRemainder, delayBufferData, numSamples - delayRemainder);
-    }
-}
 
 
 //==============================================================================
@@ -416,18 +366,18 @@ bool A3AudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* A3AudioProcessor::createEditor()
 {
-    return new A3AudioProcessorEditor (*this);
+    return new A3AudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void A3AudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void A3AudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 }
 
-void A3AudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void A3AudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -444,14 +394,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout A3AudioProcessor::createPara
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     //int numimp = desktop.getSpecialLocation(desktop.userDesktopDirectory).getChildFile("Resources").getNumberOfChildFiles(3, "*.wav");
- 
-    layout.add (std::make_unique<juce::AudioParameterFloat> ("CUTOFF", "Cutoff", 20.0f, 20000.0f, 600.0f));
-    layout.add (std::make_unique<juce::AudioParameterFloat> ("PHASERRATE", "Rate", 0.0f, 2.0f, 1.0f));
-    layout.add (std::make_unique<juce::AudioParameterFloat> ("PHASERDEPTH", "Depth", 0.0f, 1.0f, 0.5f));
-    layout.add (std::make_unique<juce::AudioParameterFloat> ("GAIN", "Gain", 0.0f, 2.0f, 1.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("CUTOFF", "Cutoff", 20.0f, 20000.0f, 600.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("PHASERRATE", "Rate", 0.0f, 2.0f, 1.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("PHASERDEPTH", "Depth", 0.0f, 1.0f, 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("GAIN", "Gain", 0.0f, 2.0f, 1.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("DELAY", "Delay", 0.0f, 1.0f, 0.0f));
-    layout.add (std::make_unique<juce::AudioParameterInt> ("FILTERMENU", "Filter Menu", 1, 4, 4));
-    layout.add (std::make_unique<juce::AudioParameterInt> ("PHASERMENU", "Phaser Menu", 1, 2, 2));
+    layout.add(std::make_unique<juce::AudioParameterInt>("FILTERMENU", "Filter Menu", 1, 4, 4));
+    layout.add(std::make_unique<juce::AudioParameterInt>("PHASERMENU", "Phaser Menu", 1, 2, 2));
     layout.add(std::make_unique<juce::AudioParameterInt>("IMPULSEMENU", "Impulse Menu", 1, 9, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("REVERBMENU", "Reverb Menu", 1, 5, 1));
     layout.add(std::make_unique<juce::AudioParameterInt>("EMULATEDMENU", "Emulated IR Menu", 1, 5, 1));
@@ -465,7 +415,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout A3AudioProcessor::createPara
     layout.add(std::make_unique<juce::AudioParameterFloat>("IRLENGTH", "Emulated IR Length", 0.0f, 6.0f, 0.0f));
     //layout.add(std::make_unique<juce::AudioParameterBool>("BUTTON", "Button", false));
     //layout.add(std::make_unique<juce::ButtonParameterAttachment>(juce::RangedAudioParameter::, "Button"));
-    
+
 
     return layout;
 }
